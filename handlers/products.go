@@ -1,16 +1,38 @@
 package handlers
 
 import (
-	"context"
 	"database/sql"
+	"encoding/json"
 	"fmt"
-	"math/rand"
-	"time"
+	"log"
+	"net/http"
 
-	"github.com/google/uuid"
-	dd "github.com/oms/db"
+	d "github.com/oms/db"
 )
 
+func GetProductsHandler(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+
+		products, err := d.FetchAllProducts(db)
+		if err != nil {
+			log.Println(err)
+		}
+
+		products_json, err := json.Marshal(products)
+		if err != nil {
+			log.Println(err)
+		}
+		fmt.Println(string(products_json))
+		w.Header().Add("Content-Type", "application/json")
+		err = json.NewEncoder(w).Encode(products_json)
+
+		if err != nil {
+			log.Println(err)
+		}
+	}
+}
+
+/*
 func SeedProducts(db *sql.DB) error {
 	// 1. Create a context with a timeout (e.g., 5 seconds)
 	// Even though you have Background(), a timeout ensures
@@ -34,7 +56,7 @@ func SeedProducts(db *sql.DB) error {
 
 		// 2. Use ExecContext.
 		// Note: Change '?' to '$1, $2...' if you are using PostgreSQL.
-		query := `INSERT INTO products (id, name, price, out_of_stock, created_at) 
+		query := `INSERT INTO products (id, name, price, out_of_stock, created_at)
 				  VALUES (?, ?, ?, ?, ?)`
 
 		_, err := db.ExecContext(ctx, query, p.ID, p.Name, p.Price, p.OutOfStock, p.CreatedAt)
@@ -45,4 +67,4 @@ func SeedProducts(db *sql.DB) error {
 
 	fmt.Println("Successfully added 20 products!")
 	return nil
-}
+}*/

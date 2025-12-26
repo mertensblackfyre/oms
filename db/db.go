@@ -7,19 +7,13 @@ import (
 	"log"
 	"os"
 
-	"github.com/google/uuid"
 	"github.com/oms/utils"
 	_ "github.com/tursodatabase/libsql-client-go/libsql"
 )
 
 var DB *sql.DB
 
-func GenerateUUID() string {
-	id := uuid.New() // UUID v4
-	return id.String()
-}
-
-func init() {
+func DBs() *sql.DB {
 
 	url := utils.TURSO_DATABASE_URL + "?authToken=" + utils.TURSO_AUTH_TOKEN
 
@@ -35,7 +29,7 @@ func init() {
 
 	PRAGMA foreign_keys = ON;
 
-	CREATE TABLE users (
+	CREATE TABLE IF NOT EXISTS users (
     	id TEXT PRIMARY KEY,              -- UUID
     	email TEXT UNIQUE NOT NULL,
     	name TEXT,
@@ -43,7 +37,7 @@ func init() {
     	created_at TEXT DEFAULT CURRENT_TIMESTAMP
 	);
 
-	CREATE TABLE products (
+	CREATE TABLE IF NOT EXISTS products (
     	id TEXT PRIMARY KEY,              -- UUID
     	name TEXT NOT NULL,
     	price REAL NOT NULL,
@@ -51,7 +45,7 @@ func init() {
     	created_at TEXT DEFAULT CURRENT_TIMESTAMP
 	);
 
-	CREATE TABLE orders (
+	CREATE TABLE IF NOT EXISTS orders (
     	id TEXT PRIMARY KEY,              -- UUID
     	user_id TEXT NOT NULL,
     	product_id TEXT NOT NULL,
@@ -69,5 +63,5 @@ func init() {
 	}
 
 	DB = db
-	defer db.Close()
+	return db
 }

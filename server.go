@@ -1,23 +1,30 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/jwtauth/v5"
+	"github.com/oms/db"
+	"github.com/oms/handlers"
 	"github.com/oms/utils"
 )
 
 func main() {
+
+	db := db.DBs()
 	addr := ":8000"
 	fmt.Printf("Starting server on %v\n", addr)
-	http.ListenAndServe(addr, router())
+	http.ListenAndServe(addr, router(db))
 
+	defer db.Close()
 }
 
-func router() http.Handler {
+func router(db *sql.DB) http.Handler {
+
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
 
@@ -38,9 +45,7 @@ func router() http.Handler {
 		r.Get("/login", func(w http.ResponseWriter, r *http.Request) {
 			utils.GenerateJWT(w)
 		})
-		r.Get("/register", func(w http.ResponseWriter, r *http.Request) {
-			utils.GenerateJWT(w)
-		})
+		r.Post("/register", handlers.RegisterUser(db))
 	})
 
 	return r

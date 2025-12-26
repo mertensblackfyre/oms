@@ -36,7 +36,10 @@ func router() http.Handler {
 	// Public routes
 	r.Group(func(r chi.Router) {
 		r.Get("/login", func(w http.ResponseWriter, r *http.Request) {
-			utils.Generate(w)
+			utils.GenerateJWT(w)
+		})
+		r.Get("/register", func(w http.ResponseWriter, r *http.Request) {
+			utils.GenerateJWT(w)
 		})
 	})
 

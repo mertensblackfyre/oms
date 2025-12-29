@@ -12,10 +12,8 @@ import (
 
 func RegisterUser(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-
 		w.Header().Set("Content-Type", "application/json")
 		
-
 		// Decode JSON from Request
 		var body map[string]string
 		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
@@ -42,7 +40,6 @@ func RegisterUser(db *sql.DB) http.HandlerFunc {
 			http.Error(w, "server error", http.StatusInternalServerError)
 			return
 		}
-
 
 		id := uuid.NewString()
 
